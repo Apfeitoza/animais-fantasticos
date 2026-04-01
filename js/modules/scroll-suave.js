@@ -1,29 +1,32 @@
-export default function initScrollSuave() {
-  const linksInternos = document.querySelectorAll(
-    "[data-menu='suave'] a[href^='#']",
-  );
-  function scrollToSection(e) {
+export default class ScrollSuave {
+  constructor(links, options) {
+    this.linksInternos = document.querySelectorAll(links);
+    if (options === undefined) {
+      this.options = { behavior: "smooth", block: "start" };
+    } else {
+      this.options = options;
+    }
+    this.scrollToSection = this.scrollToSection.bind(this);
+    //quando criar classe, fazer bind de função que usara como callback para referenciar o objeto ao this
+  }
+
+  scrollToSection(e) {
     e.preventDefault();
     const href = e.currentTarget.getAttribute("href");
     const section = document.querySelector(href);
-
-    section.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-
-    //Forma Alternativa
-    // const topo = section.offsetTop;
-    // window.scrollTo({
-    //     top: topo,
-    //     behavior: "smooth",
-    // });
+    section.scrollIntoView(this.options);
   }
 
-  linksInternos.forEach((link) => {
-    link.addEventListener("click", scrollToSection);
-  });
-}
+  addLinkEvent() {
+    this.linksInternos.forEach((link) => {
+      link.addEventListener("click", this.scrollToSection);
+    });
+  }
 
-//usar export para exportar funções em modulos
-//se for só uma só export default
+  init() {
+    if (this.linksInternos.length) {
+      this.addLinkEvent();
+    }
+    return this;
+  }
+}
